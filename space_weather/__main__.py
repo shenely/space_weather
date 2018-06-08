@@ -1,61 +1,60 @@
 ''''''
 
 #built-in libraries
+import time
 import urlparse
 import json
-import logging
-import logging.config
-import logging.handlers
+import sched
 
 #external libraries
 #...
 
 #internal libraries
-import __init__ as planet
+import __init__ as space_weather
 
 #exports
 __all__ = ()
 
 #constants
+TRIVIAL = 10000
+LOW = 1000
+NORMAL = 100
+HIGH = 10
+CRITICAL = 1
+
 URL_PROTON_FLUX = ('http',
                    'services.swpc.noaa.gov',
                    '/text/goes-particle-flux-primary.txt',
                    '', '', '')
-LOG_FORMAT = ('Space weather %(levelname)s: '
-                    '> 10 MeV proton flux '
-                    'currently at %(value)s')
-JSON_SCHEMA = {'alert_text': '%(msg)s',
-               'level': '%(levelname)s',
-               'link': '%(link)s'}
     
+def blah(s):
+    now = time.time()
+    url = urlparse.urlunparse(URL_PROTON_FLUX)
+    data = space_weather.parse_file(url)
+    level, value = space_weather.process_data(now, data)
+
+    if level in [space_weather.INFO,
+                 space_weather.ALERT,
+                 space_weather.CRITICAL]:
+        head, body = (space_weather.generate_alert
+                      (level, value, url))
+        #space_weather.call_api('httpbin.org', 443, '/post', head, body)
+    if level >= space_weather.INFO:
+        space_weather.generate_plot(now, data, 'plot.png')
+        msg = (space_weather.generate_email
+               (level, value, 'plot.png',
+                'sean@test.com',
+                'sean.henely@gmail.com'))
+        #space_weather.send_email(msg)
+
+    delay = space_weather.next_notify(now)
+    print delay
+    s.enter(delay, NORMAL, blah, (s,))
+
 def main():
-    logging.addLevelName(planet.ALERT, 'ALERT')
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-
-    #smtp_handle = planet.EmailHandler
-    #smtp_handle.setLevel(planet.ALERT)
-    alert_format = logging.Formatter(fmt=json.dumps(JSON_SCHEMA))
-    #smtp_handle.setFormatter(alert_format)
-    #logger.addHandler(smtp_handle)
-
-    #http_handle = logging.handlers.HTTPHandler
-    alert_filter = planet.MaskedFilter('API Calls',
-                                       logging.INFO,
-                                       planet.ALERT
-                                       logging.CRITICAl)
-    #http_handle.addFilter(alert_filter)
-    #logger.addHandler(http_handle)
-
-    filename = urlparse.urlunparse(URL_PROTON_FLUX)
-    data = planet.parse_file(filename)
-    level, p_gt_10 = planet.process_data(data)
-
-    print level, p_gt_10
-    extra = {'value': p_gt_10,
-             'link': URL_PROTON_FLUX}
-    logger.log(level, LOG_FORMAT, extra=extra)
-    
+    s = sched.scheduler(time.time, time.sleep)
+    s.enter(0, NORMAL, blah, (s,))
+    s.run()
 
 if __name__ == '__main__':
     main()

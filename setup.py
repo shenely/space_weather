@@ -5,5 +5,5 @@ setup(name='space_weather',
       author='shenely',
       description='',
       packages=['space_weather'],
-      install_requires=[])
+      install_requires=['matplotlib'])
 
