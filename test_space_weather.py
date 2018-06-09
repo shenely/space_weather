@@ -28,7 +28,7 @@ class SpaceWeatherTestCase(unittest.TestCase):
         dt = datetime.datetime.utcfromtimestamp(now)
         data = [(dt - 90 * MINUTE, 1.1),
                 (dt - 85 * MINUTE, 0.9)]
-        level, value, _ = space_weather.process_data(now, data)
+        level, value = space_weather.process_data(now, data)
         self.assertEqual(level, space_weather.NOTSET)
 
     def test_level_info(self):
@@ -36,7 +36,7 @@ class SpaceWeatherTestCase(unittest.TestCase):
         now = time.time()
         dt = datetime.datetime.utcfromtimestamp(now)
         data = [(dt - 2 * HOUR, 0.9)]
-        level, value, _ = space_weather.process_data(now, data)
+        level, value = space_weather.process_data(now, data)
         self.assertEqual(level, space_weather.INFO)
 
     def test_level_warning(self):
@@ -44,7 +44,7 @@ class SpaceWeatherTestCase(unittest.TestCase):
         now = time.time()
         dt = datetime.datetime.utcfromtimestamp(now)
         data = [(dt - MINUTE, 1.1)]
-        level, value, _ = space_weather.process_data(now, data)
+        level, value = space_weather.process_data(now, data)
         self.assertEqual(level, space_weather.WARNING)
 
     def test_level_alert(self):
@@ -52,7 +52,7 @@ class SpaceWeatherTestCase(unittest.TestCase):
         now = time.time()
         dt = datetime.datetime.utcfromtimestamp(now)
         data = [(dt - MINUTE, 10.1)]
-        level, value, _ = space_weather.process_data(now, data)
+        level, value = space_weather.process_data(now, data)
         self.assertEqual(level, space_weather.ALERT)
 
     def test_level_critical(self):
@@ -60,7 +60,7 @@ class SpaceWeatherTestCase(unittest.TestCase):
         now = time.time()
         dt = datetime.datetime.utcfromtimestamp(now)
         data = [(dt - MINUTE, 100.1)]
-        level, value, _ = space_weather.process_data(now, data)
+        level, value = space_weather.process_data(now, data)
         self.assertEqual(level, space_weather.CRITICAL)
 
     def test_email(self):
