@@ -26,6 +26,8 @@ The configuration file is expected to be in the directory where the above comman
 An example configuration file may be found in the top-level directory of this project (i.e. planet.conf).
 All plots generated are saved to the directory the above command was run from.
 
+**Note**: The configuration file must contain information for a valid mail server for the program to run properly. Otherwise, the program will (gracefully) exit.
+
 For (slightly) more information, see the help documetation in the main script:
 ```bash
 python -m space_weather --help

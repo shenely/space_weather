@@ -58,7 +58,7 @@ def main():
                                  msg, fromaddr, *toaddrs)
 
     delay = space_weather.next_notify(now)
-    #schedule.enter(delay, NORMAL, main, ())
+    schedule.enter(delay, NORMAL, main, ())
 
 if __name__ == '__main__':
     logger = space_weather.get_logger()
