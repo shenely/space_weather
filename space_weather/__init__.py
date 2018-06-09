@@ -20,7 +20,7 @@ import matplotlib.dates
 
 #exports
 __all__ = ('INFO', 'WARNING', 'ALERT', 'CRITICAL',
-           'set_logger',
+           'get_logger',
            'retrieve_data', 'process_data',
            'format_filename',
            'generate_email', 'generate_alert', 'generate_plot',
