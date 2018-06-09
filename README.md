@@ -28,11 +28,15 @@ All plots generated are saved to the directory the above command was run from.
 
 **Note**: The configuration file must contain information for a valid mail server for the program to run properly. Otherwise, the program will (gracefully) exit.
 
+Documentation
+-------------------------
 For (slightly) more information, see the help documetation in the main script:
 ```bash
 python -m space_weather --help
 ```
 
+Testing
+-------------
 Test cases may be run from the top-level project directory with the following command:
 ```bash
 python -m test_space_weather
