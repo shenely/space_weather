@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(name='space_weather',
-      version='0.1',
+      version='1.0',
       author='shenely',
-      description='',
+      description='generates alerts in bad weather',
       packages=['space_weather'],
       install_requires=['matplotlib'])
 
