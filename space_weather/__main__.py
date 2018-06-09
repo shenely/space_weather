@@ -26,6 +26,7 @@ CRITICAL = 1
     
 def main():
     '''Main function'''
+    global last_level
     now = time.time()
 
     url = config.get('data', 'url')
