@@ -19,7 +19,7 @@ import matplotlib.dates
 #...
 
 #exports
-__all__ = ('INFO', 'WARNING', 'ALERT', 'CRITICAL',
+__all__ = ('NOTSET', 'INFO', 'WARNING', 'ALERT', 'CRITICAL',
            'get_logger',
            'retrieve_data', 'process_data',
            'format_filename',
@@ -79,7 +79,7 @@ def retrieve_data(filename):
                     '(may not exist)', filename)
         raise SystemExit
 
-def process_data(now, data, flag=False):
+def process_data(now, data):
     'Determine alert level and last known value'
     now = datetime.datetime.utcfromtimestamp(now)
 
@@ -95,16 +95,14 @@ def process_data(now, data, flag=False):
              WARNING if p_gt_10 > 1 else
              INFO if p_gt_10 < 1
              and now - quiet >= 90 * MINUTE
-             and not flag
              else NOTSET)
-    flag = p_gt_10 < 1 and now - quiet >= 90 * MINUTE
 
     if level > NOTSET:
         logger.info('%s space weather with proton flux of %.3e',
                     LEVEL_MAP[level], p_gt_10)
     else:
         logger.info('current proton flux of %.3e', p_gt_10)
-    return level, p_gt_10, flag
+    return level, p_gt_10
 
 def format_filename(now, filename, ext):
     'Generate filename from data provided'

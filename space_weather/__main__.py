@@ -26,36 +26,37 @@ CRITICAL = 1
     
 def main():
     '''Main function'''
-    global quiet
     now = time.time()
 
     url = config.get('data', 'url')
     data, filename = space_weather.retrieve_data(url)
     filename = space_weather.format_filename(now, filename, 'png')
-    level, value, quiet = space_weather.process_data(now, data, quiet)
+    level, value = space_weather.process_data(now, data)
 
-    if level in [space_weather.INFO,
-                 space_weather.ALERT,
-                 space_weather.CRITICAL]:
-        headers, body = (space_weather.generate_alert
-                         (level, value, url))
-        space_weather.call_api(config.get('alert', 'host'),
-                               config.getint('alert', 'port'),
-                               config.get('alert', 'url'),
-                               headers, body)
-    if level >= space_weather.INFO:
-        space_weather.generate_plot(now, data, filename)
-        fromaddr = config.get('email', 'fromaddr')
-        toaddrs = config.get('email', 'toaddrs').split(',')
-        msg = (space_weather.generate_email
-               (level, value, filename,
-                fromaddr, *toaddrs))
-        space_weather.send_email(config.get('email', 'host'),
-                                 config.getint('email', 'port'),
-                                 config.getboolean('email', 'tls'),
-                                 config.get('email', 'username'),
-                                 config.get('email', 'password'),
-                                 msg, fromaddr, *toaddrs)
+    if level > last_level:
+        if level in [space_weather.INFO,
+                     space_weather.ALERT,
+                     space_weather.CRITICAL]:
+            headers, body = (space_weather.generate_alert
+                             (level, value, url))
+            space_weather.call_api(config.get('alert', 'host'),
+                                   config.getint('alert', 'port'),
+                                   config.get('alert', 'url'),
+                                   headers, body)
+        if level >= space_weather.INFO:
+            space_weather.generate_plot(now, data, filename)
+            fromaddr = config.get('email', 'fromaddr')
+            toaddrs = config.get('email', 'toaddrs').split(',')
+            msg = (space_weather.generate_email
+                   (level, value, filename,
+                    fromaddr, *toaddrs))
+            space_weather.send_email(config.get('email', 'host'),
+                                     config.getint('email', 'port'),
+                                     config.getboolean('email', 'tls'),
+                                     config.get('email', 'username'),
+                                     config.get('email', 'password'),
+                                     msg, fromaddr, *toaddrs)
+    last_level = level
 
     delay = space_weather.next_notify(now)
     schedule.enter(delay, NORMAL, main, ())
@@ -71,7 +72,7 @@ if __name__ == '__main__':
     config = ConfigParser.SafeConfigParser()
     config.read(args['config'])
     
-    quiet = False#quiet INFO email/alert only done once
+    last_level = space_weather.NOTSET#email/alert only sent at first breach
     schedule = sched.scheduler(time.time, time.sleep)
     schedule.enter(0, NORMAL, main, ())
 
